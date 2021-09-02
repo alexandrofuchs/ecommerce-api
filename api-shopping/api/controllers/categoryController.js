@@ -6,10 +6,8 @@ const isAdmin = require("../middlewares/isAdmin");
 const isValidId = require("../middlewares/isValidId");
 const router = express.Router();
 
-router.use(isAuthenticate, isAdmin);
-
 router.route('/')
-    .post(async (req, res) => {
+    .post(isAuthenticate, isAdmin,  async (req, res) => {
         try {
             const { description } = req.body;
 
@@ -19,6 +17,10 @@ router.route('/')
 
             if (!maxAndMinLength(description, 3, 100)) {
                 return res.status(400).json({ message: "descrição inválida!" })
+            }
+
+            if(await Category.findOne({ where: { description } } ) ){
+                return res.status(400).json({ message: "Categoria já existe!" })
             }
 
             let foundOrCreatedCategory = await Category.findOrCreate({ description, where: { description } });
@@ -33,7 +35,7 @@ router.route('/')
     .get(async (req, res) => {
         try {
             const foundCategories = await Category.findAll();
-            return res.status(200).json({ message: "Ok!", data: foundCategories });
+            return res.status(200).json(foundCategories);
         } catch (error) {
             console.log(e.message);
             return res.status(500).json({ message: "Server error!" });
@@ -44,6 +46,7 @@ router.route('/')
 router.route('/:id')
     .all(isValidId)
     .delete(
+        isAuthenticate, isAdmin,
         async (req, res) => {
             try {
                 const id = req.params.id;
@@ -59,10 +62,11 @@ router.route('/:id')
         }
     )
     .get(
+        isAuthenticate, isAdmin,
         async (req, res) => {
             try {
                 const foundCategory = await Category.findOne({where: {id: req.params.id}});
-                return res.status(200).json({ message: "Ok!", data: foundCategory });
+                return res.status(200).json({ data: foundCategory });
             } catch (error) {
                 console.log(error);
                 return res.status(500).json({ message: "Server error!" })
@@ -70,6 +74,7 @@ router.route('/:id')
         }
     )
     .put(
+        isAuthenticate, isAdmin,
         async (req, res) => {
             try {
                 const id = req.params.id;
@@ -77,7 +82,7 @@ router.route('/:id')
                 const { description } = req.body;
 
                 if (!isWord(description)) {
-                    return res.status(400).json({ message: "invalid description!", data: null });
+                    return res.status(400).json({ message: "invalid description!" });
                 }
 
                 const updatedCategory = await Category.update({
@@ -88,7 +93,7 @@ router.route('/:id')
                     individualHooks: true
                 });
 
-                return res.status(200).json({ message: "Ok"});
+                return res.status(204);
 
             } catch (error) {
                 console.log(error);

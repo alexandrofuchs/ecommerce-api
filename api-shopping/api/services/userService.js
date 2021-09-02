@@ -1,6 +1,6 @@
 const User = require('../../database/models/User');
 const { Op } = require('sequelize');
-const { isEmpty, isAlphanumeric } = require("../helpers/validate");
+const { isEmpty, isAlphanumeric, maxAndMinLength, isValidEmail, minLength, isWord } = require("../helpers/validate");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -28,7 +28,9 @@ const authenticate = async (req, res) => {
 
         let token = await jwt.sign({
             id: foundUser.id,
-            name: foundUser.name,
+            firstName: foundUser.firstName,
+            lastName: foundUser.lastName,
+            cpf: foundUser.cpf,
             email: foundUser.email,
             createdAt: foundUser.createdAt,
             updatedAt: foundUser.updatedAt,
@@ -37,11 +39,11 @@ const authenticate = async (req, res) => {
             expiresIn: 60 * 60
         })
 
-        return res.status(200).json({ message: "Ok!", data: token });
+        return res.status(200).json({ token });
 
     } catch (err) {
         console.log(err.message);
-        return res.status(500).json({ message: "Server Error!", data: null });
+        return res.status(500).json({ message: "Server Error!" });
     }
 }
 
@@ -50,6 +52,26 @@ const createOrUpdate = async (req, res) => {
     try {
         const errors = [];
         const user = { ...req.body }
+
+        if(!maxAndMinLength(user.cpf, 11, 11)){
+            errors.push('cpf invalido!')
+        } 
+        if(!isValidEmail(user.email)){
+            errors.push('email invalido!')
+        } 
+        if(!isWord(user.firstName)){
+            errors.push('nome invalido!')
+        } 
+        if(!isWord(user.lastName)){
+            errors.push('sobrenome inválido!')
+        } 
+        if (!minLength(user.password, 8)) {
+            errors.push("senha deve conter letras e numeros e minimo 8 caracteres!")  
+        }
+
+        if(errors.length > 0){
+            return res.status(400).json(errors)
+        }
 
         const foundUser = await User.findOne({
             where: {
@@ -62,21 +84,19 @@ const createOrUpdate = async (req, res) => {
 
         if(!!foundUser && foundUser.id !== req.params.id){
             if (user.email === foundUser.email) {
-                errors.push({ field: 'email', message: "email já registrado!" });
+                errors.push("email já registrado!");
             }
             if (user.cpf === foundUser.cpf) {
-                errors.push({ field: 'cpf', message: "cpf já registrado!" });
+                errors.push("cpf já registrado!");
             }            
-            if (user.password.length <= 8 | !isAlphanumeric(user.password)) {
-                errors.push({ field: 'password', message: "senha deve conter letras e numeros e minimo 8 caracteres!" })  
-            }
-            return res.status(400).json({ error: [ ...errors ] })
+            return res.status(400).json(errors)
         }
 
         if (req.params.id) {
             await User.update(user, { where: { id: req.params.id } })
             return res.status(204).json();
         } else {
+            console.log(user)
             const createdUser = await User.create(user);
             createdUser.password = undefined;
             return res.status(201).json({ createdUser });

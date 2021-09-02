@@ -33,6 +33,4 @@ const DBConnection = async () => {
 
 DBConnection();
 
-
-
 app.listen(1996);

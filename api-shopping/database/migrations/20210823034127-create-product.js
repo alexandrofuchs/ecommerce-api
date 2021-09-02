@@ -18,6 +18,9 @@ module.exports = {
         type: DataTypes.DATE,
         allowNull: false
       },
+      url:{
+        type: DataTypes.STRING,
+      },
       name: {
         type: DataTypes.STRING(100),
         allowNull: false,

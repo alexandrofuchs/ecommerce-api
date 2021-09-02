@@ -7,6 +7,7 @@ const router = express.Router();
 const isAdmin = require('../middlewares/isAdmin');
 
 router.post('/authenticate', authenticate);
+router.get('/validate', isAuthenticate, async (req, res) => await res.status(200).json(true));
 router.post('/', createOrUpdate);
 router.get('/', isAuthenticate, isAdmin, findAll);
 

@@ -52,10 +52,8 @@ function maxLength(value, max) {
 }
 
 function minLength(value, min) {
-    if (!isEmpty(value)) {
-        return !(String(value).length < min);
-    }
-    return false;
+    if (isEmpty(value)) return false;
+    return (String(value).length >= min);        
 }
 
 function maxAndMinLength(value, min, max) {
