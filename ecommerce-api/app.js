@@ -17,14 +17,14 @@ require('./api/controllers/userController')(app);
 require('./api/controllers/addressController')(app);
 require('./api/controllers/productController')(app);
 require('./api/controllers/categoryController')(app);
-require('./api/controllers/orderController')(app);
+require('./api/controllers/OrderController')(app);
 
 const DBConnection = async () => {
   try {
     await db.connection.authenticate();
     console.log('Connection has been established successfully.');
     if (process.env.NODE_ENV == 'test') {
-      //await db.connection.sync({ force: true});
+      await db.connection.sync({ force: true });
     }
   } catch (error) {
     console.error('Unable to connect to database!', error);

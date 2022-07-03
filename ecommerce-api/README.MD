@@ -1,16 +1,17 @@
 # Back-end with Express
 
 ## Description
-- Infraestrutura de back-end para uma aplicação ecommerce.
-- Back-end implementado na forma de uma API REST. 
+- back-end para uma aplicação ecommerce.
+- back-end implementado na forma de uma API REST. 
 - 2 microserviços distintos baseados na plataforma Node.js.
 
 ## Tecnologias:
 - Framework Express;
-- sailsJS
-- Sequelize 
+- sailsJS;
+- Sequelize;
+- mongoose;
 - PostgreSQL with ElephantSQL 
-- JWT (JSON Web Token):
+- Autenticação JWT (JSON Web Token):
 
 ## Funcionalidades:
 

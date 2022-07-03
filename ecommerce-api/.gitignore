@@ -1,11 +1,12 @@
-config/local.js
-
+node_modules
+.env
+config/database.json
 *lock.json
 node_modules
 
 .tmp
 
-.env
+
 *~
 *#
 .DS_STORE
@@ -23,4 +24,3 @@ lib-cov
 *.log
 *.out
 *.pid
-
